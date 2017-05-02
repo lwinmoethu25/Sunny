@@ -92,6 +92,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(10);
+        viewPager.setClipToPadding(false);
+        viewPager.setPageMargin(12);
         setupViewPager(viewPager);
 
         googleApiClient = new GoogleApiClient.Builder(this)
@@ -154,11 +156,11 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             if (requestCode == REQUEST_CODE) {
 
 
-                /*Database database = CouchBaseHelper.openCouchBaseDB(this);
+                Database database = CouchBaseHelper.openCouchBaseDB(this);
                 ArrayList<String> citiesArrayList = CouchBaseHelper.getCitiesFromTheDB(database);
 
 
-                if (viewPagerAdapter.getCount() < citiesArrayList.size()) {
+                if ((viewPagerAdapter.getCount() - 1) < citiesArrayList.size()) {
 
                     Bundle bundle = new Bundle();
                     bundle.putString(CITY, citiesArrayList.get(citiesArrayList.size() - 1));
@@ -168,7 +170,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
                     viewPagerAdapter.addFragment(cityWeatherFragment);
                     viewPagerAdapter.notifyDataSetChanged();
-                }*/
+                    viewPager.setCurrentItem(citiesArrayList.size(), true);//scroll to newly added city
+                }
 
             }
         }
