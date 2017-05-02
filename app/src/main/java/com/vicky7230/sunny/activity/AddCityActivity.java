@@ -10,9 +10,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.couchbase.lite.Database;
 import com.vicky7230.sunny.R;
 import com.vicky7230.sunny.adapter.CityListAdapter;
+import com.vicky7230.sunny.couchDB.CouchBaseHelper;
 import com.vicky7230.sunny.utils.Util;
 
 import java.util.ArrayList;
@@ -58,6 +61,13 @@ public class AddCityActivity extends AppCompatActivity {
         cityListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Database database = CouchBaseHelper.openCouchBaseDB(AddCityActivity.this);
+                CouchBaseHelper.saveCityInDB(database, suggestionsArrayList.get(position));
+                Toast.makeText(AddCityActivity.this, suggestionsArrayList.get(position) + " added.", Toast.LENGTH_SHORT).show();
+
+                setResult(RESULT_OK);
+                finish();
 
             }
         });

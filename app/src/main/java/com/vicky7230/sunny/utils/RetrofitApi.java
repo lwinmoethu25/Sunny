@@ -32,11 +32,18 @@ public class RetrofitApi {
 
     public interface ApiInterface {
 
-
         @GET("weather")
         Call<CurrentWeather> getCurrentWeather(
                 @Query("lat") String lat,
                 @Query("lon") String lon,
+                @Query("appid") String appId,
+                @Query("units") String units
+        );
+
+
+        @GET("weather")
+        Call<CurrentWeather> getCityWeather(
+                @Query("q") String cityName,
                 @Query("appid") String appId,
                 @Query("units") String units
         );

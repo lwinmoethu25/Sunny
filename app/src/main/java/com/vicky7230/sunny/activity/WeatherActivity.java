@@ -1,7 +1,7 @@
 package com.vicky7230.sunny.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,30 +16,32 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Database;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.joanzapata.iconify.widget.IconTextView;
 import com.vicky7230.sunny.R;
-import com.vicky7230.sunny.retrofitPojo.currentWeather.CurrentWeather;
-import com.vicky7230.sunny.utils.RetrofitApi;
+import com.vicky7230.sunny.adapter.ViewPagerAdapter;
+import com.vicky7230.sunny.couchDB.CouchBaseHelper;
+import com.vicky7230.sunny.fragment.CityWeatherFragment;
+import com.vicky7230.sunny.fragment.CurrentWeatherFragment;
+import com.vicky7230.sunny.pojo.LatLon;
 import com.vicky7230.sunny.utils.Util;
 
-import java.util.Calendar;
+import org.greenrobot.eventbus.EventBus;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.ArrayList;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -47,24 +49,19 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private static final String TAG = WeatherActivity.class.getSimpleName();
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 200;
     public static final String METRIC = "metric";
+    public static final String CITY = "city";
+    private static final int REQUEST_CODE = 345;
 
     private GoogleApiClient googleApiClient;
 
     @SuppressWarnings("FieldCanBeLocal")
     private Location lastLocation;
-
-    private TextView tempTextView;
-    private TextView tempHighTextView;
-    private TextView tempLowTextView;
-    private TextView locationTextView;
-    private TextView weatherTextView;
-    private TextView windTextView;
-
-    private IconTextView weatherIcon;
-    private IconTextView timeIcon;
-
     private LocationRequest locationRequest;
+    @SuppressWarnings("FieldCanBeLocal")
     private FloatingActionButton addCityButton;
+
+    private ViewPager viewPager;
+    private ViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -93,14 +90,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
     private void init() {
 
-        tempTextView = (TextView) findViewById(R.id.temp);
-        tempHighTextView = (TextView) findViewById(R.id.temp_high);
-        tempLowTextView = (TextView) findViewById(R.id.temp_low);
-        locationTextView = (TextView) findViewById(R.id.location);
-        weatherIcon = (IconTextView) findViewById(R.id.weather_icon);
-        weatherTextView = (TextView) findViewById(R.id.weather);
-        windTextView = (TextView) findViewById(R.id.wind);
-        timeIcon = (IconTextView) findViewById(R.id.time_icon);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
+        viewPager.setOffscreenPageLimit(10);
+        setupViewPager(viewPager);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -123,11 +115,65 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
     }
 
+    private void setupViewPager(ViewPager viewPager) {
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new CurrentWeatherFragment());
+
+        Database database = CouchBaseHelper.openCouchBaseDB(this);
+        ArrayList<String> citiesArrayList = CouchBaseHelper.getCitiesFromTheDB(database);
+
+        for (String city : citiesArrayList) {
+
+            Bundle bundle = new Bundle();
+            bundle.putString(CITY, city);
+
+            Log.d(TAG, "city name : " + city);
+
+            CityWeatherFragment cityWeatherFragment = new CityWeatherFragment();
+            cityWeatherFragment.setArguments(bundle);
+
+            viewPagerAdapter.addFragment(cityWeatherFragment);
+
+        }
+
+        viewPager.setAdapter(viewPagerAdapter);
+    }
+
     private void showAddCityActivity() {
 
-        startActivity(new Intent(this, AddCityActivity.class));
+        startActivityForResult(new Intent(this, AddCityActivity.class), REQUEST_CODE);
 
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CODE) {
+
+
+                /*Database database = CouchBaseHelper.openCouchBaseDB(this);
+                ArrayList<String> citiesArrayList = CouchBaseHelper.getCitiesFromTheDB(database);
+
+
+                if (viewPagerAdapter.getCount() < citiesArrayList.size()) {
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString(CITY, citiesArrayList.get(citiesArrayList.size() - 1));
+
+                    CityWeatherFragment cityWeatherFragment = new CityWeatherFragment();
+                    cityWeatherFragment.setArguments(bundle);
+
+                    viewPagerAdapter.addFragment(cityWeatherFragment);
+                    viewPagerAdapter.notifyDataSetChanged();
+                }*/
+
+            }
+        }
+    }
+
 
     @Override
     public void onStart() {
@@ -187,8 +233,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
         if (lastLocation != null) {
 
             Log.d(TAG, "Lat : " + String.valueOf(lastLocation.getLatitude()) + ", Lon : " + String.valueOf(lastLocation.getLongitude()));
-            getCurrentWeatherData(String.valueOf(lastLocation.getLatitude()), String.valueOf(lastLocation.getLongitude()));
 
+            //post the lat long values to current weather fragment
+            EventBus.getDefault().post(new LatLon(String.valueOf(lastLocation.getLatitude()), String.valueOf(lastLocation.getLongitude())));
         }
 
         //noinspection MissingPermission
@@ -218,99 +265,11 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     public void onLocationChanged(Location location) {
 
         Log.d(TAG, "Lat : " + String.valueOf(location.getLatitude()) + ", Lon : " + String.valueOf(location.getLongitude()));
-        getCurrentWeatherData(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()));
+        //post the lat long values to current weather fragment
+        EventBus.getDefault().post(new LatLon(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude())));
 
     }
 
-    private void getCurrentWeatherData(String lat, String lon) {
-
-        RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
-
-        Call<CurrentWeather> responseBodyCall = apiInterface.getCurrentWeather(
-                lat,
-                lon,
-                RetrofitApi.API_KEY,
-                METRIC
-        );
-
-        responseBodyCall.enqueue(new Callback<CurrentWeather>() {
-            @Override
-            public void onResponse(Call<CurrentWeather> call, Response<CurrentWeather> response) {
-
-                if (response.isSuccessful()) {
-
-
-                    CurrentWeather currentWeather = response.body();
-
-                    displayCurrentWeather(currentWeather);
-
-
-                } else {
-
-                    Toast.makeText(WeatherActivity.this, "Some Error.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CurrentWeather> call, Throwable t) {
-
-                Toast.makeText(WeatherActivity.this, "Network Error.", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void displayCurrentWeather(CurrentWeather currentWeather) {
-
-        timeIcon.setText("{ion-android-time 20sp} " + Util.getCurrentTime());
-
-        tempTextView.setText(currentWeather.getMain().getTemp().toString());
-
-        locationTextView.setText(currentWeather.getName() + "," + currentWeather.getSys().getCountry());
-
-        weatherTextView.setText(currentWeather.getWeather().get(0).getMain());
-
-        tempHighTextView.setText("H " + currentWeather.getMain().getTempMax().toString());
-        tempLowTextView.setText("  L " + currentWeather.getMain().getTempMin().toString());
-
-        windTextView.setText("Winds : " + currentWeather.getWind().getSpeed().toString() + " m/s");
-
-        if (currentWeather.getWeather().get(0).getIcon().equals("01d"))
-            weatherIcon.setText("{mc-sun-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("01n"))
-            weatherIcon.setText("{mc-moon}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("02d"))
-            weatherIcon.setText("{mc-sun-cloud-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("02n"))
-            weatherIcon.setText("{mc-moon-cloud}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("03d"))
-            weatherIcon.setText("{mc-cloud-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("03n"))
-            weatherIcon.setText("{mc-cloud}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("04d"))
-            weatherIcon.setText("{mc-cloud-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("04n"))
-            weatherIcon.setText("{mc-cloud}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("09d"))
-            weatherIcon.setText("{mc-cloud-rain-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("09n"))
-            weatherIcon.setText("{mc-cloud-rain}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("10d"))
-            weatherIcon.setText("{mc-cloud-drop-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("10n"))
-            weatherIcon.setText("{mc-cloud-drop}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("11d"))
-            weatherIcon.setText("{mc-cloud-double-thunder2-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("11n"))
-            weatherIcon.setText("{mc-cloud-double-thunder}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("13d"))
-            weatherIcon.setText("{mc-cloud-snow3-o}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("13n"))
-            weatherIcon.setText("{mc-cloud-snow2}");
-        else if (currentWeather.getWeather().get(0).getIcon().equals("50d") || currentWeather.getWeather().get(0).getIcon().equals("50n"))
-            weatherIcon.setText("{mc-sea-o}");
-    }
 
     public void changeRings() {
 

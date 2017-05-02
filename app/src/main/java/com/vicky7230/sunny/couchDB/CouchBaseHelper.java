@@ -1,7 +1,6 @@
 package com.vicky7230.sunny.couchDB;
 
 import android.content.Context;
-import android.location.Location;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -11,7 +10,10 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.android.AndroidContext;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -20,10 +22,7 @@ public class CouchBaseHelper {
     private static final String TAG = CouchBaseHelper.class.getSimpleName();
     private static final String DB_NAME = "sunny_db";
 
-    private static final String LOCATION_DOCUMENT_ID = "location";
-
-    public static final String LATITUDE = "latitude";
-    public static final String LONGITUDE = "longitude";
+    private static final String CITIES_DOCUMENT_ID = "cities";
 
     /**
      * Open database connection
@@ -59,36 +58,49 @@ public class CouchBaseHelper {
         return database;
     }
 
+    public static void saveCityInDB(Database database, String city) {
 
-    public static void saveLatLonInDB(Database database, Location location) {
+        Document citiesDocument = database.getDocument(CITIES_DOCUMENT_ID);
+        Map<String, Object> citiesMap = new HashMap<>();
 
-        Document locationDocument = database.getDocument(LOCATION_DOCUMENT_ID);
-        Map<String, Object> locationMap = new HashMap<>();
+        if (citiesDocument.getProperties() != null)
+            citiesMap.putAll(citiesDocument.getProperties());
 
-        if (locationDocument.getProperties() != null)
-            locationMap.putAll(locationDocument.getProperties());//put old data from the document in the new locationMap( update )
-
-        locationMap.put(LATITUDE, location.getLatitude());
-        locationMap.put(LONGITUDE, location.getLongitude());
+        citiesMap.put(city, city);
 
         try {
-            locationDocument.putProperties(locationMap);
+            citiesDocument.putProperties(citiesMap);
         } catch (CouchbaseLiteException e) {
-            Log.e(TAG, "Error putting location in DB : " + e);
+            Log.e(TAG, "Error putting cities in DB : " + e);
         }
-
     }
 
+    public static ArrayList<String> getCitiesFromTheDB(Database database) {
 
-    public static Map<String, Object> getLatLonFromDB(Database database) {
+        Document citiesDocument = database.getDocument(CITIES_DOCUMENT_ID);
+        Map<String, Object> citiesMap = new HashMap<>();
 
-        Document locationDocument = database.getDocument(LOCATION_DOCUMENT_ID);
-        Map<String, Object> locationMap = new HashMap<>();
+        if (citiesDocument.getProperties() != null)
+            citiesMap.putAll(citiesDocument.getProperties());
 
-        if (locationDocument.getProperties() != null)
-            locationMap.putAll(locationDocument.getProperties());//put old data from the document in the new locationMap( update )
+        ArrayList<String> citiesArrayList = new ArrayList<>();
 
-        return locationMap;
+        Iterator it = citiesMap.entrySet().iterator();
 
+        while (it.hasNext()) {
+
+            Map.Entry pair = (Map.Entry) it.next();
+
+            if (pair.getKey().equals("_id") || pair.getKey().equals("_rev"))
+                ;
+            else {
+
+                citiesArrayList.add(pair.getValue().toString());
+            }
+        }
+
+        Collections.sort(citiesArrayList);
+
+        return citiesArrayList;
     }
 }
