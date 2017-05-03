@@ -91,22 +91,22 @@ public class CityWeatherFragment extends Fragment {
 
                 if (response.isSuccessful()) {
 
-
                     CurrentWeather currentWeather = response.body();
 
                     displayCurrentWeather(currentWeather);
 
-
                 } else {
 
-                    Toast.makeText(getActivity(), "Some Error.", Toast.LENGTH_SHORT).show();
+                    if (getActivity() != null)
+                        Toast.makeText(getActivity(), "Some Error.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<CurrentWeather> call, Throwable t) {
 
-                Toast.makeText(getActivity(), "Network Error.", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null)
+                    Toast.makeText(getActivity(), "Network Error.", Toast.LENGTH_SHORT).show();
 
             }
         });

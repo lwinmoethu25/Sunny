@@ -1,6 +1,8 @@
 package com.vicky7230.sunny.activity;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -59,6 +62,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     private LocationRequest locationRequest;
     @SuppressWarnings("FieldCanBeLocal")
     private FloatingActionButton addCityButton;
+    private FloatingActionButton sunAndMoon;
 
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
@@ -115,6 +119,19 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
             }
         });
 
+        sunAndMoon = (FloatingActionButton) findViewById(R.id.sun_and_moon);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+
+        ObjectAnimator animation = ObjectAnimator.ofFloat(sunAndMoon, "translationX", width);
+        animation.setDuration(5000);
+        animation.setRepeatCount(ValueAnimator.INFINITE);
+        animation.setRepeatMode(ValueAnimator.REVERSE);
+        animation.start();
     }
 
     private void setupViewPager(ViewPager viewPager) {

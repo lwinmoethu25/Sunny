@@ -3,7 +3,6 @@ package com.vicky7230.sunny.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,14 +86,13 @@ public class CurrentWeatherFragment extends Fragment {
 
                 if (response.isSuccessful()) {
 
-
                     CurrentWeather currentWeather = response.body();
 
                     displayCurrentWeather(currentWeather);
 
-
                 } else {
 
+                    if (getActivity() != null)
                     Toast.makeText(getActivity(), "Some Error.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -102,7 +100,8 @@ public class CurrentWeatherFragment extends Fragment {
             @Override
             public void onFailure(Call<CurrentWeather> call, Throwable t) {
 
-                Toast.makeText(getActivity(), "Network Error.", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null)
+                    Toast.makeText(getActivity(), "Network Error.", Toast.LENGTH_SHORT).show();
 
             }
         });
