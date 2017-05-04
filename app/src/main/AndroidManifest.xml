@@ -26,8 +26,10 @@
         <activity
             android:name=".activity.AddCityActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.SettingsActivity">
-        </activity>
+        <activity
+            android:name=".activity.SavedCitiesActivity"
+            android:label="Settings"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

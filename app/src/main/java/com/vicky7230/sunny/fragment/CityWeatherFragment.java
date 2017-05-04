@@ -121,7 +121,7 @@ public class CityWeatherFragment extends Fragment {
 
         locationTextView.setText(currentWeather.getName() + "," + currentWeather.getSys().getCountry());
 
-        weatherTextView.setText(currentWeather.getWeather().get(0).getMain());
+        weatherTextView.setText(currentWeather.getWeather().get(0).getDescription());
 
         tempHighTextView.setText("H " + currentWeather.getMain().getTempMax().toString());
         tempLowTextView.setText("  L " + currentWeather.getMain().getTempMin().toString());

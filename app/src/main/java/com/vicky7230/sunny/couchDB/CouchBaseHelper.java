@@ -75,6 +75,23 @@ public class CouchBaseHelper {
         }
     }
 
+    public static void removeCityFromDB(Database database, String city) {
+
+        Document citiesDocument = database.getDocument(CITIES_DOCUMENT_ID);
+        Map<String, Object> citiesMap = new HashMap<>();
+
+        if (citiesDocument.getProperties() != null)
+            citiesMap.putAll(citiesDocument.getProperties());
+
+        citiesMap.remove(city);
+
+        try {
+            citiesDocument.putProperties(citiesMap);
+        } catch (CouchbaseLiteException e) {
+            Log.e(TAG, "Error putting cities in DB : " + e);
+        }
+    }
+
     public static ArrayList<String> getCitiesFromTheDB(Database database) {
 
         Document citiesDocument = database.getDocument(CITIES_DOCUMENT_ID);

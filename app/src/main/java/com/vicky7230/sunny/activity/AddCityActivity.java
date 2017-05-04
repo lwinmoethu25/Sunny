@@ -73,14 +73,14 @@ public class AddCityActivity extends AppCompatActivity {
                     intent.putExtra(NEW_CITY_ADDED, suggestionsArrayList.get(position));
 
                     setResult(RESULT_OK, intent);
-                    finish();
 
                 } else {
 
-                    setResult(RESULT_CANCELED);
-                    finish();
+                    setResult(RESULT_OK);
 
                 }
+
+                finish();
 
             }
         });
