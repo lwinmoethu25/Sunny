@@ -1,6 +1,7 @@
 package com.vicky7230.sunny.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.couchbase.lite.Database;
 import com.vicky7230.sunny.R;
@@ -25,6 +25,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class AddCityActivity extends AppCompatActivity {
 
+    public static final String NEW_CITY_ADDED = "newCityAdded";
     private EditText cityEditText;
     private ListView cityListView;
 
@@ -63,11 +64,23 @@ public class AddCityActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Database database = CouchBaseHelper.openCouchBaseDB(AddCityActivity.this);
-                CouchBaseHelper.saveCityInDB(database, suggestionsArrayList.get(position));
-                Toast.makeText(AddCityActivity.this, suggestionsArrayList.get(position) + " added.", Toast.LENGTH_SHORT).show();
 
-                setResult(RESULT_OK);
-                finish();
+                if (CouchBaseHelper.getCitiesFromTheDB(database).size() < 4) {
+
+                    CouchBaseHelper.saveCityInDB(database, suggestionsArrayList.get(position));
+
+                    Intent intent = new Intent();
+                    intent.putExtra(NEW_CITY_ADDED, suggestionsArrayList.get(position));
+
+                    setResult(RESULT_OK, intent);
+                    finish();
+
+                } else {
+
+                    setResult(RESULT_CANCELED);
+                    finish();
+
+                }
 
             }
         });
@@ -112,7 +125,7 @@ public class AddCityActivity extends AppCompatActivity {
 
                 for (String city : allCityArrayList) {
 
-                    if (city.toLowerCase().contains(cityEditText.getText().toString().toLowerCase()))
+                    if (city.toLowerCase().startsWith(cityEditText.getText().toString().toLowerCase()))
                         suggestionsArrayList.add(city);
                 }
 

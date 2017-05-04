@@ -8,24 +8,24 @@ public class Wind {
 
     @SerializedName("speed")
     @Expose
-    private Double speed;
+    private Float speed;
     @SerializedName("deg")
     @Expose
-    private Integer deg;
+    private Float deg;
 
-    public Double getSpeed() {
+    public Float getSpeed() {
         return speed;
     }
 
-    public void setSpeed(Double speed) {
+    public void setSpeed(Float speed) {
         this.speed = speed;
     }
 
-    public Integer getDeg() {
+    public Float getDeg() {
         return deg;
     }
 
-    public void setDeg(Integer deg) {
+    public void setDeg(Float deg) {
         this.deg = deg;
     }
 

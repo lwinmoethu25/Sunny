@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -49,11 +50,14 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class WeatherActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    public static final String OPEN_SETTINGS = "Open Settings";
     private static final String TAG = WeatherActivity.class.getSimpleName();
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 200;
     public static final String METRIC = "metric";
     public static final String CITY = "city";
-    private static final int REQUEST_CODE = 345;
+    private static final int MY_REQUEST_CODE = 345;
+    public static final String SWIPE_RIGHT_TO_SEE_NEW_ADDED_CITY = "Swipe right to see new added city.";
+    public static final String REMOVE_A_CITY_BEFORE_ADDING_NEW_ONE = "Remove a city before adding new one.";
 
     private GoogleApiClient googleApiClient;
 
@@ -66,6 +70,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
+
+    private Snackbar snackbar;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -93,6 +99,9 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
 
     private void init() {
+
+        snackbar = Snackbar.make(findViewById(R.id.container), SWIPE_RIGHT_TO_SEE_NEW_ADDED_CITY, Snackbar.LENGTH_LONG);
+
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(10);
@@ -160,7 +169,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
     private void showAddCityActivity() {
 
-        startActivityForResult(new Intent(this, AddCityActivity.class), REQUEST_CODE);
+        startActivityForResult(new Intent(this, AddCityActivity.class), MY_REQUEST_CODE);
 
     }
 
@@ -169,8 +178,8 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CODE) {
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
 
 
                 Database database = CouchBaseHelper.openCouchBaseDB(this);
@@ -179,17 +188,35 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
                 if ((viewPagerAdapter.getCount() - 1) < citiesArrayList.size()) {
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString(CITY, citiesArrayList.get(citiesArrayList.size() - 1));
+                    if (data != null) {
 
-                    CityWeatherFragment cityWeatherFragment = new CityWeatherFragment();
-                    cityWeatherFragment.setArguments(bundle);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(CITY, data.getStringExtra(AddCityActivity.NEW_CITY_ADDED));
 
-                    viewPagerAdapter.addFragment(cityWeatherFragment);
-                    viewPagerAdapter.notifyDataSetChanged();
-                    viewPager.setCurrentItem(citiesArrayList.size(), true);//scroll to newly added city
+                        CityWeatherFragment cityWeatherFragment = new CityWeatherFragment();
+                        cityWeatherFragment.setArguments(bundle);
+
+                        viewPagerAdapter.addFragment(cityWeatherFragment);
+                        viewPagerAdapter.notifyDataSetChanged();
+
+                        snackbar.setText(SWIPE_RIGHT_TO_SEE_NEW_ADDED_CITY);
+                        snackbar.show();
+
+                    }
                 }
 
+            } else if (resultCode == RESULT_CANCELED) {
+
+                snackbar.setText(REMOVE_A_CITY_BEFORE_ADDING_NEW_ONE);
+                snackbar.setAction(OPEN_SETTINGS, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        startActivity(new Intent(WeatherActivity.this, SettingsActivity.class));
+
+                    }
+                });
+                snackbar.show();
             }
         }
     }

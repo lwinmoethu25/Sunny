@@ -19,9 +19,6 @@ public class CurrentWeather {
     @SerializedName("main")
     @Expose
     private Main main;
-    @SerializedName("visibility")
-    @Expose
-    private Integer visibility;
     @SerializedName("wind")
     @Expose
     private Wind wind;
@@ -74,14 +71,6 @@ public class CurrentWeather {
 
     public void setMain(Main main) {
         this.main = main;
-    }
-
-    public Integer getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(Integer visibility) {
-        this.visibility = visibility;
     }
 
     public Wind getWind() {
