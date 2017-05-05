@@ -3,7 +3,6 @@ package com.vicky7230.sunny.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,11 +14,16 @@ import android.widget.Toast;
 import com.joanzapata.iconify.widget.IconTextView;
 import com.vicky7230.sunny.R;
 import com.vicky7230.sunny.activity.WeatherActivity;
+import com.vicky7230.sunny.pojo.LatLon;
 import com.vicky7230.sunny.retrofitPojo.Forecast.Forecast;
 import com.vicky7230.sunny.retrofitPojo.Forecast.List;
 import com.vicky7230.sunny.retrofitPojo.Weather.CurrentWeather;
 import com.vicky7230.sunny.utils.RetrofitApi;
 import com.vicky7230.sunny.utils.Util;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,9 +39,9 @@ import static com.vicky7230.sunny.activity.WeatherActivity.DEGREE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CityWeatherFragment extends Fragment {
+public class CurrentLocationWeatherFragment extends Fragment {
 
-    private static final String TAG = CityWeatherFragment.class.getSimpleName();
+    private static final String TAG = CurrentLocationWeatherFragment.class.getSimpleName();
 
     private DateFormat sourceDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
     private DateFormat destinationDateFormat = new SimpleDateFormat("hh a\nEEE, d MMM", Locale.ENGLISH);
@@ -53,7 +57,7 @@ public class CityWeatherFragment extends Fragment {
     private IconTextView timeIcon;
 
 
-    public CityWeatherFragment() {
+    public CurrentLocationWeatherFragment() {
         // Required empty public constructor
     }
 
@@ -63,7 +67,8 @@ public class CityWeatherFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_city_weather, container, false);
+        View view = inflater.inflate(R.layout.fragment_current_location_weather, container, false);
+
 
         tempTextView = (TextView) view.findViewById(R.id.temp);
         tempHighTextView = (TextView) view.findViewById(R.id.temp_high);
@@ -76,32 +81,21 @@ public class CityWeatherFragment extends Fragment {
 
         return view;
 
+
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-
-            getCityWeatherData(bundle.getString(WeatherActivity.CITY));
-            getCityForecastData(bundle.getString(WeatherActivity.CITY));
-
-        }
-    }
-
-    private void getCityWeatherData(String city) {
+    private void getCurrentLocationWeatherData(String lat, String lon) {
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
-        Call<CurrentWeather> responseBodyCall = apiInterface.getCityWeather(
-                city,
+        Call<CurrentWeather> currentWeatherCall = apiInterface.getCurrentLocationWeather(
+                lat,
+                lon,
                 RetrofitApi.API_KEY,
                 WeatherActivity.METRIC
         );
 
-        responseBodyCall.enqueue(new Callback<CurrentWeather>() {
+        currentWeatherCall.enqueue(new Callback<CurrentWeather>() {
             @Override
             public void onResponse(Call<CurrentWeather> call, Response<CurrentWeather> response) {
 
@@ -178,15 +172,17 @@ public class CityWeatherFragment extends Fragment {
             weatherIcon.setText("{mc-cloud-snow2}");
         else if (currentWeather.getWeather().get(0).getIcon().equals("50d") || currentWeather.getWeather().get(0).getIcon().equals("50n"))
             weatherIcon.setText("{mc-sea-o}");
+
     }
 
 
-    private void getCityForecastData(String city) {
+    private void getCurrentLocationForecastData(String lat, String lon) {
 
         RetrofitApi.ApiInterface apiInterface = RetrofitApi.getApiInterfaceInstance();
 
-        Call<Forecast> forecastCall = apiInterface.getCityForecast(
-                city,
+        Call<Forecast> forecastCall = apiInterface.getCurrentLocationForecast(
+                lat,
+                lon,
                 RetrofitApi.API_KEY,
                 WeatherActivity.METRIC,
                 "5"
@@ -279,4 +275,25 @@ public class CityWeatherFragment extends Fragment {
 
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLatLonUpdate(LatLon latLon) {
+
+        getCurrentLocationWeatherData(latLon.getLat(), latLon.getLon());
+        getCurrentLocationForecastData(latLon.getLat(), latLon.getLon());
+
+    }
 }

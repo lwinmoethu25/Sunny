@@ -11,6 +11,7 @@ import com.vicky7230.sunny.R;
 import com.vicky7230.sunny.adapter.SavedCityListAdapter;
 import com.vicky7230.sunny.couchDB.CouchBaseHelper;
 import com.vicky7230.sunny.pojo.Remove;
+import com.vicky7230.sunny.utils.Util;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,6 +33,8 @@ public class SavedCitiesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Util.night())
+            setTheme(R.style.AppThemeNight);
         setContentView(R.layout.activity_saved_cities);
 
         init();

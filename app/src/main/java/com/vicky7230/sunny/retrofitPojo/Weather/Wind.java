@@ -1,5 +1,5 @@
 
-package com.vicky7230.sunny.retrofitPojo.currentWeather;
+package com.vicky7230.sunny.retrofitPojo.Weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,24 +8,24 @@ public class Wind {
 
     @SerializedName("speed")
     @Expose
-    private Float speed;
+    private Double speed;
     @SerializedName("deg")
     @Expose
-    private Float deg;
+    private Double deg;
 
-    public Float getSpeed() {
+    public Double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(Float speed) {
+    public void setSpeed(Double speed) {
         this.speed = speed;
     }
 
-    public Float getDeg() {
+    public Double getDeg() {
         return deg;
     }
 
-    public void setDeg(Float deg) {
+    public void setDeg(Double deg) {
         this.deg = deg;
     }
 

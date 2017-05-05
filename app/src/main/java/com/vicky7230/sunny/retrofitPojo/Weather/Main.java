@@ -1,5 +1,5 @@
 
-package com.vicky7230.sunny.retrofitPojo.currentWeather;
+package com.vicky7230.sunny.retrofitPojo.Weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,79 +8,79 @@ public class Main {
 
     @SerializedName("temp")
     @Expose
-    private Float temp;
+    private Double temp;
     @SerializedName("pressure")
     @Expose
-    private Float pressure;
+    private Double pressure;
     @SerializedName("humidity")
     @Expose
-    private Integer humidity;
+    private Long humidity;
     @SerializedName("temp_min")
     @Expose
-    private Float tempMin;
+    private Double tempMin;
     @SerializedName("temp_max")
     @Expose
-    private Float tempMax;
+    private Double tempMax;
     @SerializedName("sea_level")
     @Expose
-    private Float seaLevel;
+    private Double seaLevel;
     @SerializedName("grnd_level")
     @Expose
-    private Float grndLevel;
+    private Double grndLevel;
 
-    public Float getTemp() {
+    public Double getTemp() {
         return temp;
     }
 
-    public void setTemp(Float temp) {
+    public void setTemp(Double temp) {
         this.temp = temp;
     }
 
-    public Float getPressure() {
+    public Double getPressure() {
         return pressure;
     }
 
-    public void setPressure(Float pressure) {
+    public void setPressure(Double pressure) {
         this.pressure = pressure;
     }
 
-    public Integer getHumidity() {
+    public Long getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(Integer humidity) {
+    public void setHumidity(Long humidity) {
         this.humidity = humidity;
     }
 
-    public Float getTempMin() {
+    public Double getTempMin() {
         return tempMin;
     }
 
-    public void setTempMin(Float tempMin) {
+    public void setTempMin(Double tempMin) {
         this.tempMin = tempMin;
     }
 
-    public Float getTempMax() {
+    public Double getTempMax() {
         return tempMax;
     }
 
-    public void setTempMax(Float tempMax) {
+    public void setTempMax(Double tempMax) {
         this.tempMax = tempMax;
     }
 
-    public Float getSeaLevel() {
+    public Double getSeaLevel() {
         return seaLevel;
     }
 
-    public void setSeaLevel(Float seaLevel) {
+    public void setSeaLevel(Double seaLevel) {
         this.seaLevel = seaLevel;
     }
 
-    public Float getGrndLevel() {
+    public Double getGrndLevel() {
         return grndLevel;
     }
 
-    public void setGrndLevel(Float grndLevel) {
+    public void setGrndLevel(Double grndLevel) {
         this.grndLevel = grndLevel;
     }
 

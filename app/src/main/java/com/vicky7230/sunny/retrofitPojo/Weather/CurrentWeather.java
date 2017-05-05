@@ -1,5 +1,5 @@
 
-package com.vicky7230.sunny.retrofitPojo.currentWeather;
+package com.vicky7230.sunny.retrofitPojo.Weather;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -27,19 +27,19 @@ public class CurrentWeather {
     private Clouds clouds;
     @SerializedName("dt")
     @Expose
-    private Integer dt;
+    private Long dt;
     @SerializedName("sys")
     @Expose
     private Sys sys;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Long id;
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("cod")
     @Expose
-    private Integer cod;
+    private Long cod;
 
     public Coord getCoord() {
         return coord;
@@ -89,11 +89,11 @@ public class CurrentWeather {
         this.clouds = clouds;
     }
 
-    public Integer getDt() {
+    public Long getDt() {
         return dt;
     }
 
-    public void setDt(Integer dt) {
+    public void setDt(Long dt) {
         this.dt = dt;
     }
 
@@ -105,11 +105,11 @@ public class CurrentWeather {
         this.sys = sys;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -121,11 +121,11 @@ public class CurrentWeather {
         this.name = name;
     }
 
-    public Integer getCod() {
+    public Long getCod() {
         return cod;
     }
 
-    public void setCod(Integer cod) {
+    public void setCod(Long cod) {
         this.cod = cod;
     }
 

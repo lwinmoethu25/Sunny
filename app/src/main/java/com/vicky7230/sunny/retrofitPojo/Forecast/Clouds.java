@@ -1,5 +1,5 @@
 
-package com.vicky7230.sunny.retrofitPojo.currentWeather;
+package com.vicky7230.sunny.retrofitPojo.Forecast;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,13 +8,13 @@ public class Clouds {
 
     @SerializedName("all")
     @Expose
-    private Integer all;
+    private Long all;
 
-    public Integer getAll() {
+    public Long getAll() {
         return all;
     }
 
-    public void setAll(Integer all) {
+    public void setAll(Long all) {
         this.all = all;
     }
 

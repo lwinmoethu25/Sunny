@@ -41,7 +41,7 @@ import com.vicky7230.sunny.R;
 import com.vicky7230.sunny.adapter.ViewPagerAdapter;
 import com.vicky7230.sunny.couchDB.CouchBaseHelper;
 import com.vicky7230.sunny.fragment.CityWeatherFragment;
-import com.vicky7230.sunny.fragment.CurrentWeatherFragment;
+import com.vicky7230.sunny.fragment.CurrentLocationWeatherFragment;
 import com.vicky7230.sunny.pojo.LatLon;
 import com.vicky7230.sunny.utils.Util;
 
@@ -58,6 +58,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
     public static final String OPEN_SETTINGS = "Open Settings";
     public static final String METRIC = "metric";
     public static final String CITY = "city";
+    public static final String DEGREE = "\u00b0";
 
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 200;
     private static final int MY_REQUEST_CODE_ADD_CITY = 345;
@@ -161,7 +162,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
     private void setupViewPager(ViewPager viewPager) {
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragment(new CurrentWeatherFragment());
+        viewPagerAdapter.addFragment(new CurrentLocationWeatherFragment());
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
         ArrayList<String> citiesArrayList = CouchBaseHelper.getCitiesFromTheDB(database);
@@ -187,7 +188,7 @@ public class WeatherActivity extends AppCompatActivity implements GoogleApiClien
 
         viewPagerAdapter.removeFragments();
 
-        viewPagerAdapter.addFragment(new CurrentWeatherFragment());
+        viewPagerAdapter.addFragment(new CurrentLocationWeatherFragment());
 
         Database database = CouchBaseHelper.openCouchBaseDB(this);
         ArrayList<String> citiesArrayList = CouchBaseHelper.getCitiesFromTheDB(database);

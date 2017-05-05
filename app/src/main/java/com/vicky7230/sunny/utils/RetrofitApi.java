@@ -1,7 +1,8 @@
 package com.vicky7230.sunny.utils;
 
 
-import com.vicky7230.sunny.retrofitPojo.currentWeather.CurrentWeather;
+import com.vicky7230.sunny.retrofitPojo.Forecast.Forecast;
+import com.vicky7230.sunny.retrofitPojo.Weather.CurrentWeather;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -33,7 +34,7 @@ public class RetrofitApi {
     public interface ApiInterface {
 
         @GET("weather")
-        Call<CurrentWeather> getCurrentWeather(
+        Call<CurrentWeather> getCurrentLocationWeather(
                 @Query("lat") String lat,
                 @Query("lon") String lon,
                 @Query("appid") String appId,
@@ -46,6 +47,23 @@ public class RetrofitApi {
                 @Query("q") String cityName,
                 @Query("appid") String appId,
                 @Query("units") String units
+        );
+
+        @GET("forecast")
+        Call<Forecast> getCurrentLocationForecast(
+                @Query("lat") String lat,
+                @Query("lon") String lon,
+                @Query("appid") String appId,
+                @Query("units") String units,
+                @Query("cnt") String count
+        );
+
+        @GET("forecast")
+        Call<Forecast> getCityForecast(
+                @Query("q") String cityName,
+                @Query("appid") String appId,
+                @Query("units") String units,
+                @Query("cnt") String count
         );
 
     }

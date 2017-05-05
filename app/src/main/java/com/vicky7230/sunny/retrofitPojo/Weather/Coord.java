@@ -1,5 +1,5 @@
 
-package com.vicky7230.sunny.retrofitPojo.currentWeather;
+package com.vicky7230.sunny.retrofitPojo.Weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -8,24 +8,24 @@ public class Coord {
 
     @SerializedName("lon")
     @Expose
-    private Float lon;
+    private Double lon;
     @SerializedName("lat")
     @Expose
-    private Float lat;
+    private Double lat;
 
-    public Float getLon() {
+    public Double getLon() {
         return lon;
     }
 
-    public void setLon(Float lon) {
+    public void setLon(Double lon) {
         this.lon = lon;
     }
 
-    public Float getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(Float lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
