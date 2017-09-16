@@ -6,7 +6,7 @@ A very simple app to show weather.
 2. Day and night theme based on time.
 3. Add up to 4 cities.
 
-<p align="center">
+<p align="center" style="background-color:powderblue;">
   <img src="https://github.com/vicky7230/Sunny/blob/master/graphics/1.png" width="250">
   <img src="https://github.com/vicky7230/Sunny/blob/master/graphics/2.png" width="250">
   <img src="https://github.com/vicky7230/Sunny/blob/master/graphics/3.png" width="250">
